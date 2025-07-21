@@ -154,13 +154,14 @@
     import { getAnalytics } from "firebase/analytics";
     // Firebase configuration (replace with your Firebase project config)
     const firebaseConfig = {
-      apiKey: "AIzaSyAzDDeAIBjltvIldaXVIc12XWcrdwNVnG4",
-      authDomain: "websitelab-f2c2d.firebaseapp.com",
-      databaseURL: "https://websitelab-f2c2d-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "websitelab-f2c2d",
-      storageBucket: "websitelab-f2c2d.firebasestorage.app",
-      messagingSenderId: "944105995026",
-      appId: "1:944105995026:web:fca2ebe83b45a0ad6851cb"
+      apiKey: window.ENV.FIREBASE_API_KEY,
+      authDomain: window.ENV.FIREBASE_AUTH_DOMAIN,
+      databaseURL: window.ENV.FIREBASE_DATABASE_URL,
+      projectId: window.ENV.FIREBASE_PROJECT_ID,
+      storageBucket: window.ENV.FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: window.ENV.FIREBASE_MESSAGING_SENDER_ID,
+      appId: window.ENV.FIREBASE_APP_ID,
+      measurementId: "G-TSBZ2XT52T"
     };
 
     // Initialize Firebase
