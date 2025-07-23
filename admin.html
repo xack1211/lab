@@ -134,16 +134,39 @@
   <script>
     let websites = [];
 
-    // Load websites from local storage on page load
-    document.addEventListener('DOMContentLoaded', () => {
-      loadWebsites();
+    // Load websites on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadWebsites();
       renderAdminPage();
     });
 
-    // Load websites from local storage
-    function loadWebsites() {
+    // Load websites from local storage and websites.json
+    async function loadWebsites() {
+      // Load from local storage
       const stored = localStorage.getItem('websites');
       websites = stored ? JSON.parse(stored) : [];
+
+      // Fetch from websites.json
+      try {
+        const response = await fetch('/websites.json');
+        if (!response.ok) throw new Error('Failed to fetch websites.json');
+        const jsonData = await response.json();
+        if (!Array.isArray(jsonData)) throw new Error('Invalid JSON format');
+
+        // Merge jsonData with local storage, avoiding duplicates by URL
+        jsonData.forEach(newSite => {
+          if (!websites.some(site => site.url === newSite.url)) {
+            // Ensure unique ID
+            newSite.id = newSite.id || Date.now().toString() + Math.random().toString(36).slice(2);
+            websites.push(newSite);
+          }
+        });
+
+        // Save merged data to local storage
+        localStorage.setItem('websites', JSON.stringify(websites));
+      } catch (err) {
+        console.error('Error loading websites.json:', err.message);
+      }
     }
 
     // Save websites to local storage
@@ -265,7 +288,7 @@
           // Merge imported websites, avoiding duplicates by URL
           imported.forEach(newSite => {
             if (!websites.some(site => site.url === newSite.url)) {
-              // Ensure each imported site has a unique ID
+              // Ensure unique ID
               newSite.id = newSite.id || Date.now().toString() + Math.random().toString(36).slice(2);
               websites.push(newSite);
             }

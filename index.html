@@ -92,6 +92,7 @@
       <a class="navbar-brand" href="#">Favorite Websites</a>
       <div class="navbar-nav">
         <a class="nav-link active" href="#">Home</a>
+        <a class="nav-link" href="admin.html">Admin</a>
       </div>
     </div>
   </nav>
@@ -110,16 +111,39 @@
   <script>
     let websites = [];
 
-    // Load websites from local storage on page load
-    document.addEventListener('DOMContentLoaded', () => {
-      loadWebsites();
+    // Load websites on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadWebsites();
       renderHomePage();
     });
 
-    // Load websites from local storage
-    function loadWebsites() {
+    // Load websites from local storage and websites.json
+    async function loadWebsites() {
+      // Load from local storage
       const stored = localStorage.getItem('websites');
       websites = stored ? JSON.parse(stored) : [];
+
+      // Fetch from websites.json
+      try {
+        const response = await fetch('/websites.json');
+        if (!response.ok) throw new Error('Failed to fetch websites.json');
+        const jsonData = await response.json();
+        if (!Array.isArray(jsonData)) throw new Error('Invalid JSON format');
+
+        // Merge jsonData with local storage, avoiding duplicates by URL
+        jsonData.forEach(newSite => {
+          if (!websites.some(site => site.url === newSite.url)) {
+            // Ensure unique ID
+            newSite.id = newSite.id || Date.now().toString() + Math.random().toString(36).slice(2);
+            websites.push(newSite);
+          }
+        });
+
+        // Save merged data to local storage
+        localStorage.setItem('websites', JSON.stringify(websites));
+      } catch (err) {
+        console.error('Error loading websites.json:', err.message);
+      }
     }
 
     // Render home page
